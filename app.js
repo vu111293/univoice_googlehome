@@ -39,7 +39,7 @@ var server = app.listen(app.get('port'), function () {
 function findByPlace(app) {
     let place = app.getArgument('place');
     if (place) {
-        app.tell("Bạn đã yêu cầu tìm ghi chú tại " + place);
+        app.tell("Bạn đã yêu cầu tìm ghi chú tại " + place.toUpperCase());
     } else {
         app.ask("Bạn muốn tìm univoice note ở đâu?");
     }
