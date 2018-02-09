@@ -9,8 +9,8 @@ let bodyParse = require('body-parser');
 let sprintf = require('sprintf-js').sprintf;
 
 
-const FINDBY_TIME_PROMPT = ["Không hiểu. Để tìm theo thời gian, bạn có thể nói \"tìm univoice files vào ngày xxx\"." 
-+ " Để tìm theo địa điểm, bạn có thể nói \"tìm univoice files tại xxx\""];
+const FINDBY_TIME_PROMPT = ["Không hiểu. Để tìm theo thời gian, bạn có thể nói \"tìm univoice files vào ngày xxx\"."
+    + " Để tìm theo địa điểm, bạn có thể nói \"tìm univoice files tại xxx\""];
 
 
 let app = express();
@@ -57,17 +57,10 @@ function findByTime(app) {
     let aboutTime = app.getArgument('about_time'); // trước,...
     let dynamicTime = app.getArgument('dynamic_time'); // hôm qua, tuần trước
 
-    if (day == null) {
-        // case tuần trước có univoice gì?
-        // case có univoice gì vào tuần trước?
-
-        if (dynamicTime) {
-            app.tell("Bạn đã yêu cầu tìm univoice note vào " + dynamicTime.toUpperCase());
-        } else {
-            app.ask(getRandomPrompt(app, FINDBY_TIME_PROMPT));
-        }
-    } else {
-        var fullDate = " ngày " + day;
+    if (day || month || year) {
+        var fullDate = "";
+        if (day) { 
+            fullDate += " ngày " + day; }
         if (month) {
             fullDate += " tháng " + month;
         }
@@ -76,9 +69,18 @@ function findByTime(app) {
         }
 
         if (aboutTime) {
-            app.tell("Bạn đã yêu cầu tìm univoice note vào " + aboutTime.toUpperCase() + fullDate.toLocaleUpperCase());    
+            app.tell("Bạn đã yêu cầu tìm univoice note vào " + aboutTime.toUpperCase() + fullDate.toLocaleUpperCase());
         } else {
-            app.tell("Bạn đã yêu cầu tìm univoice note vào " + fullDate.toLocaleUpperCase());
+            app.tell("Bạn đã yêu cầu tìm univoice note vào" + fullDate.toLocaleUpperCase());
+        }
+    } else {
+        // case tuần trước có univoice gì?
+        // case có univoice gì vào tuần trước?
+
+        if (dynamicTime) {
+            app.tell("Bạn đã yêu cầu tìm univoice note vào " + dynamicTime.toUpperCase());
+        } else {
+            app.ask(getRandomPrompt(app, FINDBY_TIME_PROMPT));
         }
     }
 }
