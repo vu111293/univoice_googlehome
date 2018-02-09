@@ -57,7 +57,7 @@ function findByTime(app) {
         // case có univoice gì vào tuần trước?
 
         if (dynamicTime) {
-            app.tell("Bạn đã yêu cầu tìm univoice note vào " + dynamicTime);
+            app.tell("Bạn đã yêu cầu tìm univoice note vào " + dynamicTime.toUpperCase());
         } else {
             app.ask("Không hiểu");
         }
@@ -70,6 +70,6 @@ function findByTime(app) {
             fullDate += " năm " + year;
         }
 
-        app.tell("Bạn đã yêu cầu tìm univoice note vào " + aboutTime + fullDate);
+        app.tell("Bạn đã yêu cầu tìm univoice note vào " + aboutTime.toUpperCase() + fullDate.toLocaleUpperCase());
     }
 }
