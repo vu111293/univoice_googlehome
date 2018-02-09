@@ -70,6 +70,10 @@ function findByTime(app) {
             fullDate += " năm " + year;
         }
 
-        app.tell("Bạn đã yêu cầu tìm univoice note vào " + aboutTime.toUpperCase() + fullDate.toLocaleUpperCase());
+        if (aboutTime) {
+            app.tell("Bạn đã yêu cầu tìm univoice note vào " + aboutTime.toUpperCase() + fullDate.toLocaleUpperCase());    
+        } else {
+            app.tell("Bạn đã yêu cầu tìm univoice note vào " + fullDate.toLocaleUpperCase());
+        }
     }
 }
