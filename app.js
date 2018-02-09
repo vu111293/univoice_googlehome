@@ -8,6 +8,11 @@ let express = require('express');
 let bodyParse = require('body-parser');
 let sprintf = require('sprintf-js').sprintf;
 
+
+const FINDBY_TIME_PROMPT = ["Không hiểu. Để tìm theo thời gian, bạn có thể nói \"tìm univoice files vào ngày xxx\"." 
++ " Để tìm theo địa điểm, bạn có thể nói \"tìm univoice files tại xxx\""];
+
+
 let app = express();
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParse.json({ type: 'application/json' }));
@@ -59,7 +64,7 @@ function findByTime(app) {
         if (dynamicTime) {
             app.tell("Bạn đã yêu cầu tìm univoice note vào " + dynamicTime.toUpperCase());
         } else {
-            app.ask("Không hiểu");
+            app.ask(getRandomPrompt(app, FINDBY_TIME_PROMPT));
         }
     } else {
         var fullDate = " ngày " + day;
@@ -76,4 +81,22 @@ function findByTime(app) {
             app.tell("Bạn đã yêu cầu tìm univoice note vào " + fullDate.toLocaleUpperCase());
         }
     }
+}
+
+
+// Utility function to pick prompts
+function getRandomPrompt(app, array) {
+    let lastPrompt = app.data.lastPrompt;
+    let prompt;
+    if (lastPrompt) {
+        for (let index in array) {
+            prompt = array[index];
+            if (prompt != lastPrompt) {
+                break;
+            }
+        }
+    } else {
+        prompt = array[Math.floor(Math.random() * (array.length))];
+    }
+    return prompt;
 }
