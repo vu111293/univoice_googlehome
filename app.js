@@ -22,7 +22,7 @@ const SAMPLE_NOTES = [
     "No found"
 ];
 
-const FINDBY_TIME_PROMPT = ["I don't understand. To find by time, you can say \"Find univoice files plus day.\""
+const UNKNOWN_PROMPT = ["I don't understand. To find by time, you can say \"Find univoice files plus day.\""
     + " To find by place, you can say \"Find univoice files plus place name\"", "Say \"Find univoice files plus anything you think\""];
 
 const WELCOME_PROMPT = [
@@ -37,15 +37,18 @@ let app = express();
 app.set('port', (process.env.PORT || 8080));
 app.use(bodyParse.json({ type: 'application/json' }));
 
-const WELCOME_ACTION = 'welcome';
+const WELCOME_ACTION = 'input.welcome';
+const UNKOWN_ACTION = 'input.unknown';
 const FINDBY_PLACE_ACTION = 'find_by_place';
 const FINDBY_TIME_ACTION = 'find_by_time';
 
 let actionMap = new Map();
 
 actionMap.set(WELCOME_ACTION, welcome);
+actionMap.set(UNKOWN_ACTION, unknown);
 actionMap.set(FINDBY_PLACE_ACTION, findByPlace);
 actionMap.set(FINDBY_TIME_ACTION, findByTime);
+
 
 
 app.post('/', function (request, response) {
@@ -69,6 +72,10 @@ var server = app.listen(app.get('port'), function () {
 // handler api
 function welcome(app) {
     app.ask(getRandomPrompt(app, WELCOME_PROMPT));
+}
+
+function unknown(app) {
+    app.ask(getRandomPrompt(app, UNKNOWN_PROMPT));
 }
 
 function findByPlace(app) {
@@ -111,7 +118,7 @@ function findByTime(app) {
         if (dynamicTime) {
             app.tell("Find note at " + dynamicTime.toUpperCase() + ". " + getRandomPrompt(app, SAMPLE_NOTES));
         } else {
-            app.ask(getRandomPrompt(app, FINDBY_TIME_PROMPT));
+            app.ask("I miss a bit. Please say again");
         }
     }
 }
