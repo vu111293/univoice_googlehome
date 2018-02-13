@@ -26,10 +26,10 @@ const UNKNOWN_PROMPT = ["I don't understand. To find by time, you can say \"Find
     + " To find by place, you can say \"Find univoice files plus place name\"", "Say \"Find univoice files plus anything you think\""];
 
 const WELCOME_PROMPT = [
-    "Hey. I'm Univoice. Can i help u?",
-    "Hi. I can find you note. Please ask me",
-    "Hello. Nice to meet u",
-    "Ok. Ask me to your note"
+    "I'm Univoice. Can i help u?",
+    "I can find you note. Please ask me",
+    "Nice to meet u",
+    "Ask me to your note"
 ];
 
 
@@ -50,10 +50,20 @@ actionMap.set(FINDBY_PLACE_ACTION, findByPlace);
 actionMap.set(FINDBY_TIME_ACTION, findByTime);
 
 
+var userId;
+var accessToken;
 
 app.post('/', function (request, response) {
     console.log('header: ' + JSON.stringify(request.headers));
     console.log('body: ' + JSON.stringify(response.body));
+    
+    accessToken = request.body.originalRequest.data.user.accessToken;
+    userId = request.body.originalRequest.data.user.userId;
+    
+    if (accessToken) {
+        console.log('accessToken is ' + accessToken);
+        console.log('userId is ' + userId);
+    }
 
     const app = new App({ request: request, response: response });
     app.handleRequest(actionMap);
@@ -71,7 +81,8 @@ var server = app.listen(app.get('port'), function () {
 
 // handler api
 function welcome(app) {
-    app.ask(getRandomPrompt(app, WELCOME_PROMPT));
+    let endId = userId ? userId.substr(userId.length - 3) : "Guest";
+    app.ask('Hi ' + endId + '. ' + getRandomPrompt(app, WELCOME_PROMPT));
 }
 
 function unknown(app) {
@@ -139,3 +150,53 @@ function getRandomPrompt(app, array) {
     }
     return prompt;
 }
+
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParse.urlencoded({ extended: false })
+app.post('/token', urlencodedParser, function (request, response) {
+    let clientId = request.body.client_id;
+    let clientSecret = request.body.client_secret;
+    let grantType = request.body['grant_type'];
+
+    console.log('client: ' + clientId);
+    console.log('secret: ' + clientSecret);
+    // verify clientid & clientsceret in db
+
+    if (grantType == 'authorization_code') {
+        // get code
+        let code = request.body['code'];
+        console.log('code: ' + code);
+
+        // generate refresh token
+        let refToken = 'YmNkZWZnaGlqa2xtbm9wcQ';
+        response.send({
+            token_type: "bearer",
+            access_token: "YmNkZWZnaGlqa2xtbm9wcQ132",
+            refresh_token: "YmNkZWZnaGlqa2xtbm9wcQ456",
+            expires_in: 300
+        });
+    } else {
+        // refresh token
+        let ref2Token = request.body['refresh_token'];
+        console.log('refresh token: ' + ref2Token);
+        response.send({
+            token_type: "bearer",
+            access_token: "YmNkZWZnaGlqa2xtbm9wcQ789",
+            expires_in: 300
+        })
+    }
+});
+
+app.get('/auth', function (request, response) {
+    console.log('auth called');
+    let responseType = request.query['response_type'];
+    let clientId = request.query['client_id'];
+    let redirectUrl = request.query['redirect_uri'];
+    let scope = request.query['scope'];
+    let state = request.query['state'];
+
+    console.log('redirect: ' + redirectUrl);
+    console.log('state: ' + state);
+
+    response.redirect(redirectUrl + '?code=Y2RlZmdoaWprbG1ub3asdasd' + '&state=' + state);
+});
