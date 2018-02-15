@@ -22,8 +22,15 @@ const SAMPLE_NOTES = [
     "No found"
 ];
 
-const UNKNOWN_PROMPT = ["I don't understand. To find by time, you can say \"Find univoice files plus day.\""
-    + " To find by place, you can say \"Find univoice files plus place name\"", "Say \"Find univoice files plus anything you think\""];
+const NEXT_NOTE_PROMPT = [
+    "Next note want to listen?",
+    "What next do you want?",
+    "What next",
+    "Next note?"
+];
+
+const UNKNOWN_PROMPT = ["I don't understand. To find by time, you can say \"Find univoice files and day.\""
+    + " To find by place, you can say \"Find univoice files plus place name\"", "Say \"Find univoice files and anything you think\""];
 
 const WELCOME_PROMPT = [
     "I'm Univoice. Can i help u?",
@@ -89,10 +96,15 @@ function unknown(app) {
     app.ask(getRandomPrompt(app, UNKNOWN_PROMPT));
 }
 
+function readNote(app) {
+    return getRandomPrompt(app, SAMPLE_NOTES) + '. ' + getRandomPrompt(app, NEXT_NOTE_PROMPT);
+}
+
 function findByPlace(app) {
     let place = app.getArgument('place');
     if (place) {
-        app.tell("Find note at " + place.toUpperCase() + ". " + getRandomPrompt(app, SAMPLE_NOTES));
+        let note = readNote(app);
+        app.ask("Find note at " + place.toUpperCase() + ". " +  note);
     } else {
         app.ask("Where do you want to find the note?");
     }
@@ -105,6 +117,7 @@ function findByTime(app) {
     let aboutTime = app.getArgument('about_time'); // trước,...
     let dynamicTime = app.getArgument('dynamic_time'); // hôm qua, tuần trước
 
+    let note = readNote(app);
     if (day || month || year) {
         var fullDate = "";
         if (day) {
@@ -118,16 +131,16 @@ function findByTime(app) {
         }
 
         if (aboutTime) {
-            app.tell("Find note at " + aboutTime.toUpperCase() + fullDate.toLocaleUpperCase() + ". " + getRandomPrompt(app, SAMPLE_NOTES));
+            app.ask("Find note at " + aboutTime + fullDate + ". " + note);
         } else {
-            app.tell("Find note at " + fullDate.toLocaleUpperCase()+ ". " + getRandomPrompt(app, SAMPLE_NOTES));
+            app.ask("Find note at " + fullDate+ ". " + note);
         }
     } else {
         // case tuần trước có univoice gì?
         // case có univoice gì vào tuần trước?
 
         if (dynamicTime) {
-            app.tell("Find note at " + dynamicTime.toUpperCase() + ". " + getRandomPrompt(app, SAMPLE_NOTES));
+            app.ask("Find note at " + dynamicTime + ". " + note);
         } else {
             app.ask("I miss a bit. Please say again");
         }
